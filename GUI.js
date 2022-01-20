@@ -1,28 +1,15 @@
-/*
-Config layout...
-
-{
-    "config_name": {
-        
-    } -> {} is stringified and encoded in base64 
-    <-- Load proc -->
-        (1) JSON.parse (entire config)
-        (2) atob(current config);
-        (3) JSON.parse (current config)
-}
-
-*/
 function createGUI(options = {}) {
     let windowKey = "KEY"; // Name of the property in the window
     let globalKey; // Makes "this" useable globally
     class SedatedGUI {
         constructor(options = {}) {
             globalKey = this;
+            this.windowKey = windowKey;
             // CURRENT CONFIG SHOULD BE READABLE. DO NOT ENCODE.
             this.config = options.config || {};
             // All configs doesn't have to be 100% parsed and readable (to the user). Instead, config values can be encoded in base64 format which can be decoded later.
             this.allConfigs = options.allConfigs || {};
-            this.tabs = options.tabs || ["Tab"] 
+            this.tabs = options.tabs || ["Tab"]
             this.menu = {
                 content: "",
                 built: false
@@ -47,7 +34,7 @@ function createGUI(options = {}) {
         mkDefault = (key, def) => this.config[key] = this.config[key] ?? def;
         // This is used to VERIFY localStorage objects ONLY ON LOAD to prevent null / undefined
         getStorageObj(key, fallbackValue) {
-            // Values should consistently be objects. 
+            // Values should consistently be objects.
             let value = JSON.parse(localStorage.getItem(key));
             if (value == undefined || value == null) {
                 localStorage.setItem(key, JSON.stringify(fallbackValue || {}));
@@ -115,7 +102,7 @@ function createGUI(options = {}) {
             });
         }
         exportConfig() {
-            /* 
+            /*
                 Exported value should be the base64 of {key : [name of config], value : [value of config]}
                 Slightly different (entire object should be encoded)
                 <-- Config export process -->
@@ -265,6 +252,7 @@ function createGUI(options = {}) {
             dragElement(document.getElementById(divId));
         }
         updateConfig(key, value, slider = false, global = false) {
+            console.log(`${key} -> ${value} (${typeof value})`)
             if (slider) document.getElementById("slider-" + slider).innerHTML = value; // Some issues here with jQuery.
             if (global) {
                 this.menuGlobals[key] = value;
@@ -285,7 +273,7 @@ function createGUI(options = {}) {
                     globalKey.updateConfig(configKey, previousValue); // Fallback to previous value (menu closed)
                 } else {
                     let nKey = {
-                        "Space": "space", // Key prop evals to "" 
+                        "Space": "space", // Key prop evals to ""
                         "Backspace": "delete"
                     } [event.code] ?? event["key"].toLowerCase(); // Prevent funky looking overflows
                     globalKey.updateConfig(configKey, nKey);
@@ -299,7 +287,7 @@ function createGUI(options = {}) {
         }
         getRandomMonkey() {
             // Returns a random monkey from runescape as a png.
-            // Just a random joke feature I felt like implementing 
+            // Just a random joke feature I felt like implementing
             return "https://GUI.sedated.repl.co/runescape/" + this.menuData.monkeys[Math.floor(Math.random() * this.menuData.monkeys.length)] + ".png"
         }
         createMenu(callback) {
@@ -374,6 +362,9 @@ function createGUI(options = {}) {
             this.mkDefault(configKey, null);
             this.menu.content += `<div class="cheatMainDiv">${label}<div class = "cheatKeybind" onclick = "${windowKey}.updateKeybind('${configKey}', this)">${globalKey.config[configKey] || "None"}</div></div>`
         }
+        createLabel(label) {
+            this.menu.content += `<div class="cheatMainDiv">${label || "Invalid"}</div>`;
+        }
         createSelect(label, options, configKey) {
             this.mkDefault(configKey, null);
             this.menu.content += `<div class="cheatMainDiv">${label}<select class="cheatSelect" onchange="${windowKey}.updateConfig('${configKey}', this.value)">`
@@ -387,11 +378,13 @@ function createGUI(options = {}) {
             this.menu.content += `<div class="cheatMainDiv"><button class="cheatButton" onclick="${callback}" >${label}</button></div>`
         }
         // In the future have this autoresize based on how many children are present in container div (flexbox).
-        createSection(label, callback, size) {
+        createSection(label, callback, options = {}) {
+            options = options ?? {};
             let elSize = {
                 "small": "cheatSectionSmall"
-            } [size] ?? "";
-            this.menu.content += `<fieldset class = "cheatSection ${elSize}"><legend class="cheatLegend">${label}</legend>`;
+            } [options["size"]] ?? "";
+            let elID = options["id"] || "";
+            this.menu.content += `<fieldset id = "${elID}" class = "cheatSection ${elSize}"><legend class="cheatLegend">${label}</legend>`;
             callback();
             this.menu.content += "</fieldset>";
         }
@@ -401,11 +394,10 @@ function createGUI(options = {}) {
             this.menu.content += `</div>`;
         }
         createEvent(text, type, waitTime) {
-            console.log("Called with content " + text);
             let eventClass = {
                 "error": "cheatEventError",
                 "success": "cheatEventSuccess",
-                "normal": "cheatEventSuccess"
+                "normal": ""
             } [type || "success"];
             $("#cheatEventHolder").append(`<div class = "${eventClass}" id = "event-${this.menuData.currentEventID}"><p>${text}</p></div>`);
             $(`#event-${this.menuData.currentEventID}`).hide().fadeIn("fast").delay(waitTime || 5000).animate({
