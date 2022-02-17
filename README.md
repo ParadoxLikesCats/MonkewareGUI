@@ -1,7 +1,7 @@
 # MonkewareGUI
-## Please don't use this! Scaling is done very sloppily - Once I have time I'll recode this with scaling in mind at the very start...
+## Please don't use this - Scaling is done very sloppily - Once I have time I'll recode this with scaling in mind at the very start...
 #### (Scaling is built for Krunker.io)
-### Features
+### Features (Read the code to learn some concepts)
 * Full localstorage config system 
   * Creating - Creates a new config
   * Deleting - Deletes currently selected config
