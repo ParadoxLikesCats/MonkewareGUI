@@ -4,7 +4,6 @@ function createGUI(options = {}) {
     class SedatedGUI {
         constructor(options = {}) {
             globalKey = this;
-            this.windowKey = windowKey;
             // CURRENT CONFIG SHOULD BE READABLE. DO NOT ENCODE.
             this.config = options.config || {};
             // All configs doesn't have to be 100% parsed and readable (to the user). Instead, config values can be encoded in base64 format which can be decoded later.
@@ -15,23 +14,27 @@ function createGUI(options = {}) {
                 built: false
             };
             this.menuGlobals = {
-                colTheme: "#fa192f"
+                colTheme: "#fa192f",
+                drawWatermark: true
             }
             this.menuData = {
                 currentTab: this.tabs[0],
                 currentConfig: false,
                 currentlyKeybinding: false,
                 currentEventID: 0,
-                rebuildFunc: null,
+                buildFunc: () => {
+                    alert("Rebuild function is not valid...")
+                },
                 monkeys: ["maniac_monkey", "monkey_archer_ninja", "monkey_aunt", "monkey_child", "monkey_corpse", "monkey_guard", "monkey_head", "monkey_item_face", "monkey_king", "monkey_ninja", "monkey_uncle", "monkey_zombie", "monkey", "reanimated_monkey", "sleeping_monkey", "stuffed_monkey"]
             };
+            this.raycaster = null;
             try {
                 this.onLoad();
             } catch (err) {
                 console.error("Error on load: " + err.stack);
             }
         }
-        mkDefault = (key, def) => this.config[key] = this.config[key] ?? def;
+        mkDefault = (key, def) => this.config[key] = (this.config[key] ?? def);
         // This is used to VERIFY localStorage objects ONLY ON LOAD to prevent null / undefined
         getStorageObj(key, fallbackValue) {
             // Values should consistently be objects.
@@ -113,7 +116,9 @@ function createGUI(options = {}) {
 
                 config is base64 -> stringifed -> stringified
             */
-            if (!this.menuData.currentConfig || !(this.menuData.currentConfig in this.allConfigs)) return;
+            if (!this.menuData.currentConfig || !(this.menuData.currentConfig in this.allConfigs)) {
+                return;
+            }
             try {
                 let config = btoa(JSON.stringify({
                     name: this.menuData.currentConfig,
@@ -209,6 +214,7 @@ function createGUI(options = {}) {
         refreshMenu(fullRefresh = false) {
             // Refresh color theme
             document.documentElement.style.cssText = `--main-col: ${this.menuGlobals.colTheme}`;
+            $("#cheatWatermark").css("display", this.menuGlobals.drawWatermark ? "block" : "none");
             localStorage.setItem("cheat_globals", JSON.stringify(this.menuGlobals));
             if (fullRefresh) {
                 this.menu.content = "";
@@ -218,11 +224,10 @@ function createGUI(options = {}) {
             }
         }
         onLoad() {
-            $('head').append('<link rel="stylesheet" href="https://GUI.sedated.repl.co/new.css">');
+            $('head').append('<link rel="stylesheet" href="https://raw.githubusercontent.com/ParadoxLikesCats/MonkewareGUI/main/style.css">');
             this.menuGlobals = this.getStorageObj("cheat_globals", this.menuGlobals);
             this.config = this.getStorageObj("default_cheat_config");
             this.allConfigs = this.getStorageObj("cheat_configs");
-            this.refreshMenu();
         }
         makeDraggable() {
             // Credit W3Schools. (jQuery UI is a pain)
@@ -252,8 +257,9 @@ function createGUI(options = {}) {
             dragElement(document.getElementById(divId));
         }
         updateConfig(key, value, slider = false, global = false) {
-            console.log(`${key} -> ${value} (${typeof value})`)
-            if (slider) document.getElementById("slider-" + slider).innerHTML = value; // Some issues here with jQuery.
+            if (slider) {
+                document.getElementById("slider-" + slider).innerHTML = value; // Some issues here with jQuery.
+            }
             if (global) {
                 this.menuGlobals[key] = value;
                 this.refreshMenu();
@@ -274,8 +280,7 @@ function createGUI(options = {}) {
                 } else {
                     let nKey = {
                         "Space": "space", // Key prop evals to ""
-                        "Backspace": "delete"
-                    } [event.code] ?? event["key"].toLowerCase(); // Prevent funky looking overflows
+                    } [event.code] ?? event["key"].toLowerCase(); // Prevent overflows
                     globalKey.updateConfig(configKey, nKey);
                 }
                 setTimeout(() => {
@@ -291,12 +296,7 @@ function createGUI(options = {}) {
             return "https://GUI.sedated.repl.co/runescape/" + this.menuData.monkeys[Math.floor(Math.random() * this.menuData.monkeys.length)] + ".png"
         }
         createMenu(callback) {
-            // Create menu skeleton
-            // No overlay version:
-            // <div id="cheatEventHolder"></div><div id="cheatMenu"><div id="cheatMenuHeader"><img id = "cheatLogoImg" src="https://GUI.sedated.repl.co/logo.svg" width="50px" height="50px"><p id = "cheatLogoName">monke<a id = "cheatThemeColored">ware</a></p><ul id="cheatTabHolder"> </ul> </div><div id="cheatMenuContentHolder"></div></div>
-
-            // https://GUI.sedated.repl.co/logo.svg
-            $("body").append(`<div id="cheatEventHolder"></div><div id="cheatOverlay"><div id="cheatMenu"><div id="cheatMenuHeader"><img id = "cheatLogoImg" src="${this.getRandomMonkey()}" height="50px"><p id = "cheatLogoName">monke<a id = "cheatThemeColored">ware</a></p><ul id="cheatTabHolder"> </ul> </div><div id="cheatMenuContentHolder"></div></div></div>`);
+            $("body").append(`<div id="cheatEventHolder"></div><div id="cheatOverlay"><div id="cheatMenu"><div id="cheatMenuHeader"><img id = "cheatLogoImg" src="https://github.com/ParadoxLikesCats/MonkewareGUI/blob/main/spy.png?raw=true" height="50px"><p id = "cheatLogoName">paradox<a id = "cheatThemeColored">client</a></p><ul id="cheatTabHolder"> </ul> </div><div id="cheatMenuContentHolder"></div></div></div>`);
             this.tabs.forEach(tab => {
                 let active = (tab == this.menuData.currentTab ? "active" : "");
                 $("#cheatTabHolder").append(`<li class = "cheatTab ${active}" onclick="${windowKey}.switchTabs(this)" tab="tab-${tab}">${tab}</li>`)
@@ -308,6 +308,7 @@ function createGUI(options = {}) {
             this.makeDraggable();
             this.createKeybinding();
             this.menuData.buildFunc = callback;
+            this.refreshMenu();
         }
         switchTabs(element) {
             // jQuery causes issues with switching tabs that have spaces.
@@ -337,24 +338,30 @@ function createGUI(options = {}) {
             })
             this.menu.content += "</div></div>";
             this.menu.content += `<input autocomplete = "off" id = "cheatConfigInput" type="text">`
-            this.menu.content += `<div class="cheatConfigButtons"><div id="configSelectedShow"><button class = "cheatConfigButton" onclick="${windowKey}.loadConfig()">Load</button><button class = "cheatConfigButton" onclick="${windowKey}.saveConfig()">Save</button><button id = "configDelID" class = "cheatConfigButton cheatHalfButton" onclick="${windowKey}.deleteConfig(this)">Delete</button><button class = "cheatConfigButton cheatHalfButton" onclick="${windowKey}.exportConfig()">Export</button>
+            this.menu.content += `<div class="cheatConfigButtons"><div id="configSelectedShow"><button class = "cheatConfigButton" onclick="${windowKey}.loadConfig()">Load</button><button class = "cheatConfigButton" onclick="${windowKey}.saveConfig()">Save</button><button id = "configDelID" class = "cheatConfigButton cheatHalfButton" onclick="${windowKey}.deleteConfig(this)">Delete</button><div class = "split"></div><button class = "cheatConfigButton cheatHalfButton" onclick="${windowKey}.exportConfig()">Export</button>
             </div> <div id="configSelectedHide"><button class = "cheatConfigButton" onclick="${windowKey}.createConfig()
             ">Create</button><button class = "cheatConfigButton" onclick="${windowKey}.importConfig()
             ">Import</button></div> </div>`
         }
-        createSlider(label, configKey, min, max, step = 1) {
-            this.mkDefault(configKey, min || "Invalid");
+        createSlider(label, configKey, min = 0, max = 100, step = 1) {
+            this.mkDefault(configKey, min ?? "Invalid");
             this.menu.content += `<div class="cheatMainDiv">${label}<span id = "slider-${configKey}" class ="cheatSliderLabel">${globalKey.config[configKey]}</span><br><input class = "cheatSlider" type = "range" min = "${min}" max = "${max}" step = "${step}" value = "${globalKey.config[configKey]}" oninput = "${windowKey}.updateConfig('${configKey}', parseFloat(this.value), '${configKey}')"></div>`
         }
         createInput(label, configKey) {
             this.mkDefault(configKey, "");
             this.menu.content += `<div class="cheatMainDiv">${label}<input class ="cheatInput" type="text" oninput='${windowKey}.updateConfig("${configKey}", this.value)' value="${globalKey.config[configKey]}"></div>`
         }
-        createToggle(label, configKey) {
+        createToggle(label, configKey, global = false) {
             this.mkDefault(configKey, false);
-            this.menu.content += `<div class="cheatMainDiv">${label}<label class="cheatToggle"> <input type="checkbox" onclick='${windowKey}.updateConfig("${configKey}", this.checked)' ${globalKey.config[configKey] ? "checked" : ""}><span></span></label></div>`
+            this.menu.content += `<div class="cheatMainDiv"><label class="cheatToggle"> <input type="checkbox" onclick='${windowKey}.updateConfig("${configKey}", this.checked, false, ${global})' ${(global ? globalKey.menuGlobals[configKey] : globalKey.config[configKey]) ? "checked" : ""}><span></span></label>${label}</div>`
         }
-        createColorpicker(label, configKey, global) {
+        /* Downside of non dynamic div containers */
+        createColorpickerToggle(label, toggleConfigKey, colorConfigKey) {
+            this.mkDefault(toggleConfigKey, false);
+            this.mkDefault(colorConfigKey, this.menuGlobals.colTheme);
+            this.menu.content += `<div class="cheatMainDiv"><label class="cheatToggle"> <input type="checkbox" onclick='${windowKey}.updateConfig("${toggleConfigKey}", this.checked)' ${globalKey.config[toggleConfigKey] ? "checked" : ""}><span></span></label>${label}<input class = "cheatColorpicker" oninput = "${windowKey}.updateConfig('${colorConfigKey}', this.value, false, false)" type = "color" value = "${globalKey.config[colorConfigKey]}"></div>`;
+        }
+        createColorpicker(label, configKey, global = false) {
             this.mkDefault(configKey, this.menuGlobals.colTheme);
             this.menu.content += `<div class="cheatMainDiv">${label}<input class = "cheatColorpicker" oninput = "${windowKey}.updateConfig('${configKey}', this.value, false, ${global})" type = "color" value = "${global ? globalKey.menuGlobals[configKey] : globalKey.config[configKey]}"></div>`;
         }
@@ -362,12 +369,11 @@ function createGUI(options = {}) {
             this.mkDefault(configKey, null);
             this.menu.content += `<div class="cheatMainDiv">${label}<div class = "cheatKeybind" onclick = "${windowKey}.updateKeybind('${configKey}', this)">${globalKey.config[configKey] || "None"}</div></div>`
         }
-        createLabel(label) {
-            this.menu.content += `<div class="cheatMainDiv">${label || "Invalid"}</div>`;
-        }
         createSelect(label, options, configKey) {
             this.mkDefault(configKey, null);
-            this.menu.content += `<div class="cheatMainDiv">${label}<select class="cheatSelect" onchange="${windowKey}.updateConfig('${configKey}', this.value)">`
+            // JMPHERE
+            // NOTE - Added breakline
+            this.menu.content += `<div class="cheatMainDiv">${label}<br><select class="cheatSelect" onchange="${windowKey}.updateConfig('${configKey}', this.value)">`
             options.forEach(option => {
                 this.menu.content += `<option ${option === this.config[configKey] ? "selected" : ""}>${option}</option>`
             })
@@ -375,36 +381,40 @@ function createGUI(options = {}) {
         }
         // Callback system needs to be improved
         createButton(label, callback) {
-            this.menu.content += `<div class="cheatMainDiv"><button class="cheatButton" onclick="${callback}" >${label}</button></div>`
+            let strCallback = callback + '()';
+            this.menu.content += `<div class="cheatMainDiv"><button class="cheatButton" onclick="${strCallback}">${label}</button></div>`
         }
         // In the future have this autoresize based on how many children are present in container div (flexbox).
-        createSection(label, callback, options = {}) {
-            options = options ?? {};
+        createSection(label, callback, size) {
             let elSize = {
                 "small": "cheatSectionSmall"
-            } [options["size"]] ?? "";
-            let elID = options["id"] || "";
-            this.menu.content += `<fieldset id = "${elID}" class = "cheatSection ${elSize}"><legend class="cheatLegend">${label}</legend>`;
+            } [size] ?? "";
+            this.menu.content += `<fieldset class = "cheatSection ${elSize}"><legend class="cheatLegend">${label}</legend><div class = "cheatSectionCont">`;
             callback();
-            this.menu.content += "</fieldset>";
+            this.menu.content += "</div></fieldset>";
         }
         createTabContent(tab, contentCallback) {
             this.menu.content += `<div class = "cheatTabContent ${this.tabs[tab] == this.menuData.currentTab ? "active" : ""}" id="tab-${this.tabs[tab]}">`;
             contentCallback();
             this.menu.content += `</div>`;
         }
-        createEvent(text, type, waitTime) {
+        createHolder(label, id) {
+            $("body").append(
+                `<div class="cheatHolder"></div>`
+            );
+        }
+        createEvent(text, type = "normal", waitTime = 5000) {
             let eventClass = {
                 "error": "cheatEventError",
                 "success": "cheatEventSuccess",
                 "normal": ""
-            } [type || "success"];
+            } [type];
             $("#cheatEventHolder").append(`<div class = "${eventClass}" id = "event-${this.menuData.currentEventID}"><p>${text}</p></div>`);
-            $(`#event-${this.menuData.currentEventID}`).hide().fadeIn("fast").delay(waitTime || 5000).animate({
+            $(`#event-${this.menuData.currentEventID}`).hide().fadeIn("fast").delay(waitTime).animate({
                 height: 'toggle',
                 opacity: 'toggle'
             }, 'fast');
-            this.menuData.currentEventID++;
+            ++this.menuData.currentEventID;
         }
         createKeybinding() {
             document.addEventListener("keyup", event => {
