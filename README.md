@@ -64,6 +64,5 @@ gui.createMenu(()=>{
     })
 })
 ```
-Output: https://gui.sedated.repl.co/
 
 This is my first project written in Javascript. It may be pretty messy.
