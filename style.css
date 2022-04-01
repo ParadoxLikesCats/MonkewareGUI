@@ -1,0 +1,504 @@
+/* Variables */
+
+* {
+}
+
+:root {
+    --main-col: #fa192f;
+    --el-col: white;
+    --el-border: #3d414c;
+    --el-bg: #292929;
+    --config-width: 247px
+}
+
+#cheatOverlay {
+    user-select: none !important;
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+}
+
+#cheatMenu {
+    user-select: none !important;
+    position: absolute;
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    width: 960px;
+    /* width: 843px; */
+    height: 495px;
+    max-width: 1000px;
+    max-height: 500px;
+    cursor: pointer;
+    background-color: rgba(17, 17, 17, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+#cheatMenuHeader {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    padding: 10px;
+    background-color: #1b1a1a;
+}
+
+#cheatTabHolder {
+    text-align: center;
+    overflow: hidden;
+}
+
+#cheatMenuContentHolder {
+    flex: 1;
+    max-height: 100%;
+}
+
+
+/* Main div to hold content for toggles/sliders/etc */
+.cheatMainDiv {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: var(--el-col);
+    margin: 0;
+    margin-top: 15px;
+}
+
+.cheatTab {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    display: inline;
+    padding: 10px 40px;
+    margin: 10px;
+    color: var(--el-col);
+    width: 50px;
+}
+
+.cheatTab.active {
+    color: var(--main-col);
+}
+
+.cheatTab.active.span {
+    border-bottom: none;
+}
+
+
+.cheatTabContent {
+    display: none;
+}
+
+.cheatTabContent.active {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    display: block;
+    color: var(--el-col);
+    margin: 10px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    .cheatSliderLabel {
+        color: white;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        text-align: center;
+        float: right;
+    }
+
+    .cheatSlider {
+        margin-top: 15px;
+        margin-left: -0.35px;
+        vertical-align: middle;
+        overflow: hidden;
+        width: 260px;
+        -webkit-appearance: none;
+        background-color: transparent;
+        transition: 200ms;
+        border: 1px solid var(--el-border);
+        background-color: var(--el-bg);
+    }
+
+    .cheatSlider:hover,
+    .cheatSlider:active {
+        transition: 200ms;
+        border: 1px solid var(--main-col);
+    }
+
+    .cheatSlider::-webkit-slider-runnable-track {
+        height: 12px;
+        -webkit-appearance: none;
+        color: var(--main-col);
+        margin-top: -1px;
+    }
+
+    .cheatSlider::-webkit-slider-thumb {
+        width: 0px;
+        -webkit-appearance: none;
+        height: 15px;
+        background-color: #ffffff;
+        box-shadow: -180px 0 0 180px var(--main-col);
+    }
+
+    .cheatSlider:focus {
+        outline: none;
+    }
+}
+
+.cheatToggle {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+}
+
+.cheatToggle input {
+    visibility: hidden;
+    display: block;
+    height: 0;
+    width: 0;
+    position: absolute;
+    overflow: hidden;
+}
+
+.cheatToggle span {
+    vertical-align: middle;
+    float: left;
+    height: 15px;
+    width: 15px;
+    border: 1px solid var(--el-border);
+    background-color: var(--el-bg);
+    display: inline-block;
+    transition: 200ms;
+    margin-right: 10px;
+}
+
+.cheatToggle span:hover,
+.cheatToggle span:active {
+    transition: 200ms;
+    border: 1px solid var(--main-col);
+}
+
+[type=checkbox]:checked+span {
+    background-color: var(--main-col)
+}
+
+.cheatInput {
+    float: right;
+    width: 150px;
+    border: 1px solid var(--el-border);
+    background-color: var(--el-bg);
+    color: var(--el-col);
+    transition: 200ms;
+}
+
+.cheatInput:focus {
+    outline: none;
+}
+
+.cheatInput:hover,
+.cheatInput:active {
+    transition: 200ms;
+    border: 1px solid var(--main-col);
+}
+
+.cheatSection {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    top: 20px;
+    width: 265px !important;
+    max-width: 265px !important;
+    height: 305px;
+    max-height: 305px !important;
+    margin-left: 15px;
+    border-style: solid;
+    border-width: 1px;
+    background-color: #1b1a1a;
+    /* background-color: red; */
+    border: 1px solid #333333;
+    /* margin: 15 15 15 27; */
+    float: left;
+}
+
+.cheatSectionCont {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    /* box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4); */
+}
+
+.cheatSectionCont::-webkit-scrollbar {
+    width: 0;
+}
+
+.cheatSectionCont:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-shadow: inset 0 -25px 20px -20px #141414;
+    pointer-events: none;
+}​
+
+.cheatSectionSmall {
+    width: 260px !important;
+}
+
+.cheatLegend {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: var(--el-col);
+    margin-left: 5px;
+    font-size: 15px;
+}
+
+.cheatColorpicker {
+    position: relative;
+    top: 2.5px;
+    float: right;
+    background-color: transparent !important;
+    padding: 0;
+    border-style: none !important;
+    border-radius: 0 !important;
+    height: 15px !important;
+    width: 44px !important;
+}
+
+.cheatColorpicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.cheatColorpicker::-webkit-color-swatch {
+    border: 1px solid var(--el-border);
+    transition: 200ms;
+}
+
+.cheatColorpicker::-webkit-color-swatch:hover,
+.cheatColorpicker::-webkit-color-swatch:active {
+    transition: 200ms;
+    border: 1px solid var(--main-col);
+}
+
+.cheatColorpicker:focus {
+    outline: none;
+}
+
+#cheatLogoName {
+    font-size: 17px;
+    color: var(--el-col);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+#cheatLogoImg {
+    float: left;
+    margin-right: 10px;
+}
+
+#cheatThemeColored {
+    font-size: 17px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: var(--main-col);
+}
+
+.cheatKeybind {
+    text-align: center;
+    display: inline-block;
+    float: right;
+    padding: 0px 8px 0px 8px;
+    border: 1px solid var(--el-border);
+    background-color: var(--el-bg);
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    transition: 200ms;
+}
+
+.cheatKeybind:hover,
+.cheatKeybind:active {
+    transition: 200ms;
+    border: 1px solid var(--main-col);
+}
+
+
+#cheatConfigContainer {
+    margin-top: 15px;
+    user-select: none;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #111111;
+    padding: 5px;
+    border: 1px solid #333333;
+    /* width: var(--config-width); */
+    width: calc(100% - 12px);
+    height: 130px;
+    max-height: 140px;
+    /* max-width: var(--config-width); */
+    display: flex;
+    margin-bottom: 10px;
+    overflow-y: scroll;
+}
+
+#cheatConfigInput {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    /* width: calc(var(--config-width) + 5px); */
+    width: calc(100% - 6px);
+    border: 1px solid #333333;
+    background-color: #111111;
+    color: var(--el-col);
+    margin-bottom: 5px;
+    height: 20px;
+}
+
+#cheatConfigInput:focus {
+    outline: none;
+}
+
+#cheatConfigInput:focus+label {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    position: relative;
+}
+
+#cheatConfigs {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: var(--el-col) !important;
+    background-color: #111111;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+}
+
+
+#cheatConfigs div.selected {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: var(--main-col);
+}
+
+#cheatConfigs div {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: var(--el-col);
+    margin: 7px;
+}
+
+.cheatConfigButtons {
+    padding: 1px;
+    list-style: none;
+}
+
+.cheatConfigButtons li {
+    margin: 0;
+    margin-bottom: 5px !important;
+}
+
+#configSelectedShow {
+    display: none;
+}
+
+#configSelectedHide {}
+
+.cheatConfigButton {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    border: 1px solid #3d414c;
+    background-color: #292929;
+    /* width: calc(var(--config-width) + 9px); */
+    width: 100%;
+    height: 20px;
+    color: var(--el-col);
+    margin: 0;
+    padding: 0;
+/*     margin-top: 2px;
+ */   
+  /* margin-right: 5px; */
+    margin-bottom: 2px;
+}
+
+.split {
+    display: inline-block;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+.cheatHalfButton {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    display: inline-block !important;
+    width: calc(100% / 2 - 3px);
+}
+
+.cheatButton {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    border: 1px solid var(--el-border);
+    background-color: var(--el-bg);
+    width: 272px;
+    height: 20px;
+    color: var(--el-col);
+    margin: 0;
+}
+
+#cheatEventHolder {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    margin-top: 10px;
+    z-index: 10;
+    position: fixed;
+    width: 150px;
+    top: 0;
+    margin-left: 5px;
+}
+
+#cheatEventHolder div {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: var(--el-col);
+    box-shadow: none;
+    padding: 5px 10px !important;
+    border: 1px solid #3d3d3d;
+    margin-bottom: 10px !important;
+    width: 250px;
+    background: linear-gradient(to right, var(--main-col) 3%, var(--el-bg) 3%);
+}
+
+.cheatEventError {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: white;
+    background: linear-gradient(to right, #f94343 3%, var(--el-bg) 3%) !important;
+}
+
+.cheatEventSuccess {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: white;
+    background: linear-gradient(to right, #00ff4c 3%, var(--el-bg) 3%) !important;
+}
+
+#cheatEventHolder div p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: white;
+    margin: 0;
+    padding: 0;
+    margin-left: 5px;
+}
+
+.cheatWarningLabel {
+    color: #ffe014 !important; 
+}
+
+.cheatSelect {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    background-color: var(--el-bg);
+    border: 1px solid var(--el-border);
+    color: white !important;
+    width: 250px;
+    float: left;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    transition: 200ms;
+}
+
+.cheatSelect option {
+    font-family: Verdana, Geneva, Tahoma, sans-serif !important;
+    color: white !important;
+}
+
+.cheatSelect:hover,
+.cheatSelect:active {
+    transition: 200ms;
+    border: 1px solid var(--main-col);
+}
+
+.cheatSelect:focus {
+    outline: none;
+}
+
+.cheatSelect option {
+    padding-right: 100px;
+}
